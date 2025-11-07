@@ -1,0 +1,44 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Cloudflare Workers WebSocket Client</title>
+    </head>
+    <body>
+        <input type="text" id="messageInput" placeholder="Type a message">
+        <button id="sendButton">Send</button>
+        <div id="messages"></div> <!-- the message area-->
+
+        <script>
+            const messageInput = document.getElementById("messageInput");
+            const sendButton = document.getElementById("sendButton");
+            const messagesDiv = document.getElementById("messages");
+
+            //const socket = new WebSocket("wss://your-worker-name.your-account.workers.dev/websocket"); // Replace with your Worker URL
+            const socket = new WebSocket("http://localhost:8787");
+
+            socket.onopen = (event) => {
+                messagesDiv.innerHTML += "<p>Connected to Worker!</p>";
+            };
+
+            socket.onmessage = (event) => {
+                messagesDiv.innerHTML += `<p>Server: ${event.data}</p>`;
+            };
+
+            socket.onclose = (event) => {
+                messagesDiv.innerHTML += `<p>Disconnected: ${event.code} ${event.reason}</p>`;
+            };
+
+            socket.onerror = (event) => {
+                messagesDiv.innerHTML += `<p style="color: red;">Error: ${event}</p>`;
+            };
+
+            sendButton.addEventListener("click", () => {
+                const message = messageInput.value;
+                if (message) {
+                    socket.send(message);
+                    messageInput.value = "";
+                }
+            });
+        </script>
+    </body>
+    </html>
